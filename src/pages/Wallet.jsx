@@ -5,7 +5,6 @@ import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
 
 const SUPPORT_WHATSAPP = '966591782702';
-const MIN_AMOUNT = 22;
 
 
 export default function Wallet() {
@@ -44,7 +43,6 @@ export default function Wallet() {
     setError('');
     const amt = parseFloat(amount);
     if (!amt || amt <= 0) return setError('اكتب مبلغ صحيح');
-    if (amt < MIN_AMOUNT) return setError(`الحد الأدنى للشحن ${MIN_AMOUNT} ريال`);
     setSubmitting(true);
     try {
       const { error } = await supabase.from('wallet_requests').insert({
@@ -71,8 +69,6 @@ export default function Wallet() {
         <button style={{ ...s.mTab, ...(method === 'card' ? s.mTabActive : {}) }} onClick={() => setMethod('card')}>💳 بطاقة عبر الدعم</button>
       </div>
 
-      <div style={s.minNotice}>💡 الحد الأدنى للشحن {MIN_AMOUNT} ريال</div>
-
       {method === 'bank' ? (
         <div style={s.panel}>
           {done ? (
@@ -90,7 +86,7 @@ export default function Wallet() {
                 <BankRow label="الآيبان" value={bankInfo.iban} copyable />
               </div>
               <label style={s.label}>المبلغ (ر.س)</label>
-              <input style={s.input} type="number" placeholder="الحد الأدنى: 22" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
+              <input style={s.input} type="number" placeholder="مثال: 50" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
               {error && <div style={s.error}>{error}</div>}
               <button style={s.submit} onClick={submitBank} disabled={submitting}>
                 {submitting ? <span className="spinner" /> : 'أبلغت بالتحويل'}
@@ -105,7 +101,7 @@ export default function Wallet() {
             <p style={s.cardText}>للدفع عبر بطاقة سوا، تواصل مع الدعم مباشرة وأرسل رقم البطاقة، وبيشحن رصيدك.</p>
           </div>
           <label style={s.label}>المبلغ المطلوب (ر.س)</label>
-          <input style={s.input} type="number" placeholder="الحد الأدنى: 22" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
+          <input style={s.input} type="number" placeholder="مثال: 50" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
           <a style={s.waBtnFull} href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${waText}`} target="_blank" rel="noreferrer">💬 تواصل مع الدعم على واتساب</a>
         </div>
       )}
@@ -153,10 +149,9 @@ const s = {
   wrap: { ...wrap, padding: '40px 20px 60px' },
   title: { fontSize: 32, fontWeight: 800 },
   sub: { color: theme.textDim, fontSize: 16, marginTop: 6, marginBottom: 28 },
-  methodTabs: { display: 'flex', gap: 12, marginBottom: 16 },
+  methodTabs: { display: 'flex', gap: 12, marginBottom: 24 },
   mTab: { flex: 1, padding: '16px 0', borderRadius: 16, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 15, fontWeight: 700 },
   mTabActive: { background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.4)', color: '#fff' },
-  minNotice: { background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.25)', color: '#c4b5fd', padding: '12px 16px', borderRadius: 12, fontSize: 14, fontWeight: 600, textAlign: 'center', marginBottom: 24 },
   panel: { padding: 28, background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 22 },
   bankBox: { background: 'rgba(0,0,0,0.25)', borderRadius: 16, padding: 18, marginBottom: 22 },
   bankRow: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: `1px solid ${theme.border}` },
