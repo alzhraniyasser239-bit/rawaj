@@ -10,8 +10,8 @@ const BANK_INFO = {
   accountName: 'اسمك الكامل',
   iban: 'SA0000000000000000000000',
 };
-const SUPPORT_WHATSAPP = '9665XXXXXXXX'; // رقمك بصيغة دولية بدون +
-const SUPPORT_TELEGRAM = 'i8231';
+const SUPPORT_WHATSAPP = '966591782702';
+
 
 export default function Wallet() {
   const { user, loading } = useAuth();
@@ -94,10 +94,7 @@ export default function Wallet() {
           </div>
           <label style={s.label}>المبلغ المطلوب (ر.س)</label>
           <input style={s.input} type="number" placeholder="مثال: 50" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
-          <div style={s.contactRow}>
-            <a style={s.waBtn} href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${waText}`} target="_blank" rel="noreferrer">💬 واتساب</a>
-            <a style={s.tgBtn} href={`https://t.me/${SUPPORT_TELEGRAM}`} target="_blank" rel="noreferrer">✈️ تيليجرام</a>
-          </div>
+          <a style={s.waBtnFull} href={`https://wa.me/${SUPPORT_WHATSAPP}?text=${waText}`} target="_blank" rel="noreferrer">💬 تواصل مع الدعم على واتساب</a>
         </div>
       )}
 
@@ -162,7 +159,7 @@ const s = {
   cardText: { color: theme.textDim, fontSize: 15, lineHeight: 1.9 },
   contactRow: { display: 'flex', gap: 12, marginTop: 8 },
   waBtn: { flex: 1, padding: '15px 0', borderRadius: 14, background: '#25D366', color: '#fff', fontSize: 15, fontWeight: 700, textAlign: 'center' },
-  tgBtn: { flex: 1, padding: '15px 0', borderRadius: 14, background: '#229ED9', color: '#fff', fontSize: 15, fontWeight: 700, textAlign: 'center' },
+  waBtnFull: { display: 'block', width: '100%', boxSizing: 'border-box', padding: '16px 0', borderRadius: 14, background: '#25D366', color: '#fff', fontSize: 16, fontWeight: 700, textAlign: 'center' },
   successBox: { textAlign: 'center', padding: '10px 0' },
   check: { width: 66, height: 66, margin: '0 auto 16px', borderRadius: '50%', background: 'rgba(34,197,94,0.15)', border: '2px solid #22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, color: '#22c55e' },
   successT: { fontSize: 21, fontWeight: 800, marginBottom: 10 },
