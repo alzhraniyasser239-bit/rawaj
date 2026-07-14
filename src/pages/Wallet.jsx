@@ -4,12 +4,6 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
 
-// ⚙️ عدّل هذي المعلومات ببياناتك الحقيقية
-const BANK_INFO = {
-  bankName: 'مصرف الراجحي',
-  accountName: 'اسمك الكامل',
-  iban: 'SA0000000000000000000000',
-};
 const SUPPORT_WHATSAPP = '966591782702';
 
 
@@ -22,8 +16,22 @@ export default function Wallet() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
   const [requests, setRequests] = useState([]);
+  const [bankInfo, setBankInfo] = useState({ bankName: '', accountName: '', iban: '' });
 
   useEffect(() => { if (!loading && !user) nav('/auth'); }, [loading, user]);
+
+  useEffect(() => {
+    supabase.from('settings').select('key, value').then(({ data }) => {
+      if (!data) return;
+      const map = {};
+      data.forEach((row) => { map[row.key] = row.value; });
+      setBankInfo({
+        bankName: map.bank_name || '',
+        accountName: map.bank_beneficiary || '',
+        iban: map.bank_iban || '',
+      });
+    });
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -73,9 +81,9 @@ export default function Wallet() {
           ) : (
             <>
               <div style={s.bankBox}>
-                <BankRow label="البنك" value={BANK_INFO.bankName} />
-                <BankRow label="اسم المستفيد" value={BANK_INFO.accountName} />
-                <BankRow label="الآيبان" value={BANK_INFO.iban} copyable />
+                <BankRow label="البنك" value={bankInfo.bankName} />
+                <BankRow label="اسم المستفيد" value={bankInfo.accountName} />
+                <BankRow label="الآيبان" value={bankInfo.iban} copyable />
               </div>
               <label style={s.label}>المبلغ (ر.س)</label>
               <input style={s.input} type="number" placeholder="مثال: 50" value={amount} onChange={(e) => setAmount(e.target.value)} dir="ltr" />
