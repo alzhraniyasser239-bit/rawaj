@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
 
+const ADMIN_EMAIL = 'alzhraniyasser239@gmail.com';
+
 const navLinks = [
   { to: '/', label: 'الرئيسية' },
   { to: '/services', label: 'الخدمات' },
@@ -16,6 +18,8 @@ export default function Header() {
   const loc = useLocation();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
+
+  const isAdmin = user?.email === ADMIN_EMAIL || profile?.role === 'admin';
 
   return (
     <header style={s.header}>
@@ -36,6 +40,15 @@ export default function Header() {
               {l.label}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              style={{ ...s.link, ...s.adminLink, ...(loc.pathname === '/admin' ? s.linkActive : {}) }}
+            >
+              ⚙️ الإدارة
+            </Link>
+          )}
         </nav>
 
         <div style={s.actions}>
@@ -83,6 +96,7 @@ const s = {
     color: theme.textDim, transition: 'all 0.2s',
   },
   linkActive: { color: '#fff', background: 'rgba(139,92,246,0.15)' },
+  adminLink: { color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' },
   actions: { display: 'flex', alignItems: 'center', gap: 10 },
   balancePill: {
     display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px',
