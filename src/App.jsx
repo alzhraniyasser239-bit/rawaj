@@ -3,6 +3,7 @@ import { AuthProvider } from './lib/auth';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
 import Services from './pages/Services';
 import Dashboard from './pages/Dashboard';
 import Wallet from './pages/Wallet';
@@ -14,6 +15,7 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route path="/auth" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<Layout><Home /></Layout>} />
         <Route path="/services" element={<Layout><Services /></Layout>} />
         <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
