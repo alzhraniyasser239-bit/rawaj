@@ -82,7 +82,7 @@ export default function Services() {
         <div style={s.center}><span className="spinner" /> جاري تحميل كل الخدمات...</div>
       ) : (
         <>
-          <div style={s.grid}>
+          <div style={s.grid} className="grid-services">
             {paged.map((svc) => {
               const t = timeLabel(svc.avg_time_min);
               return (
