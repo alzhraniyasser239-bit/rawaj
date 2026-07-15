@@ -30,10 +30,8 @@ export default function Home() {
   const [serviceCount, setServiceCount] = useState(4000);
 
   useEffect(() => {
-    // عدد الطلبات الحقيقي (يزيد تلقائياً)
     supabase.from('orders').select('id', { count: 'exact', head: true })
       .then(({ count }) => { if (count != null) setOrderCount(count); });
-    // عدد الخدمات الحقيقي
     supabase.from('services').select('id', { count: 'exact', head: true }).eq('is_active', true)
       .then(({ count }) => { if (count != null) setServiceCount(count); });
   }, []);
@@ -133,17 +131,17 @@ function SectionTitle({ eyebrow, title }) {
 const wrap = { maxWidth: 1200, margin: '0 auto', padding: '0 20px' };
 const s = {
   hero: { position: 'relative', overflow: 'hidden', padding: '70px 0 50px', textAlign: 'center' },
-  heroOrb1: { position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%)', top: -180, right: -100, filter: 'blur(60px)' },
-  heroOrb2: { position: 'absolute', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.3), transparent 70%)', top: -80, left: -120, filter: 'blur(60px)' },
+  heroOrb1: { position: 'absolute', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(156,122,69,0.28), transparent 70%)', top: -180, right: -100, filter: 'blur(60px)' },
+  heroOrb2: { position: 'absolute', width: 360, height: 360, borderRadius: '50%', background: 'radial-gradient(circle, rgba(201,169,97,0.25), transparent 70%)', top: -80, left: -120, filter: 'blur(60px)' },
   heroInner: { ...wrap, position: 'relative' },
-  badge: { display: 'inline-block', padding: '7px 16px', borderRadius: 100, background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 20 },
-  h1: { fontSize: 46, fontWeight: 900, lineHeight: 1.25, marginBottom: 18 },
+  badge: { display: 'inline-block', padding: '7px 16px', borderRadius: 100, background: 'rgba(156,122,69,0.15)', border: '1px solid rgba(156,122,69,0.35)', color: '#7A5D33', fontSize: 13, fontWeight: 700, marginBottom: 20 },
+  h1: { fontSize: 46, fontWeight: 900, lineHeight: 1.25, marginBottom: 18, color: theme.text },
   h1grad: { background: theme.gradientText, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   heroP: { fontSize: 17, color: theme.textDim, maxWidth: 600, margin: '0 auto 30px', lineHeight: 1.9 },
   heroCtas: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 },
-  ctaPrimary: { padding: '15px 32px', borderRadius: 14, background: theme.gradient, color: '#fff', fontSize: 16, fontWeight: 700, boxShadow: '0 8px 28px rgba(139,92,246,0.4)' },
-  ctaGhost: { padding: '15px 32px', borderRadius: 14, border: `1px solid ${theme.border}`, color: '#fff', fontSize: 16, fontWeight: 600 },
-  statRow: { display: 'inline-flex', alignItems: 'center', gap: 24, padding: '18px 28px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${theme.border}`, borderRadius: 20, flexWrap: 'wrap', justifyContent: 'center' },
+  ctaPrimary: { display: 'inline-block', padding: '15px 32px', borderRadius: 14, background: theme.gradient, color: '#fff', fontSize: 16, fontWeight: 700, boxShadow: '0 8px 24px rgba(122,93,51,0.28)' },
+  ctaGhost: { padding: '15px 32px', borderRadius: 14, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.text, fontSize: 16, fontWeight: 600 },
+  statRow: { display: 'inline-flex', alignItems: 'center', gap: 24, padding: '18px 28px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, flexWrap: 'wrap', justifyContent: 'center' },
   stat: { display: 'flex', flexDirection: 'column', gap: 2 },
   statNum: { fontSize: 24, fontWeight: 800, background: theme.gradientText, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
   statLbl: { fontSize: 12, color: theme.textDim },
@@ -154,19 +152,19 @@ const s = {
   platEmoji: { fontSize: 30 },
   platName: { fontSize: 13, fontWeight: 600, color: theme.textDim, textAlign: 'center' },
   secTitle: { textAlign: 'center', marginBottom: 36 },
-  eyebrow: { color: '#a78bfa', fontSize: 14, fontWeight: 700, letterSpacing: 1 },
-  secH2: { fontSize: 30, fontWeight: 800, marginTop: 8 },
+  eyebrow: { color: '#9C7A45', fontSize: 14, fontWeight: 700, letterSpacing: 1 },
+  secH2: { fontSize: 30, fontWeight: 800, marginTop: 8, color: theme.text },
   featGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 },
   featCard: { padding: 24, background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, textAlign: 'center' },
   featIcon: { fontSize: 32, marginBottom: 12 },
-  featTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8 },
+  featTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8, color: theme.text },
   featDesc: { fontSize: 14, color: theme.textDim, lineHeight: 1.8 },
   stepGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 },
   stepCard: { padding: 28, background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, textAlign: 'center' },
-  stepNum: { width: 52, height: 52, margin: '0 auto 16px', borderRadius: '50%', background: theme.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, boxShadow: '0 8px 20px rgba(139,92,246,0.4)' },
-  stepTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8 },
+  stepNum: { width: 52, height: 52, margin: '0 auto 16px', borderRadius: '50%', background: theme.gradient, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, boxShadow: '0 8px 18px rgba(122,93,51,0.3)' },
+  stepTitle: { fontSize: 18, fontWeight: 700, marginBottom: 8, color: theme.text },
   stepDesc: { fontSize: 14, color: theme.textDim, lineHeight: 1.8 },
-  ctaBand: { ...wrap, margin: '40px auto', padding: '48px 30px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(99,102,241,0.15))', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 28 },
-  ctaBandTitle: { fontSize: 30, fontWeight: 800, marginBottom: 12 },
+  ctaBand: { ...wrap, margin: '40px auto', padding: '48px 30px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(156,122,69,0.16), rgba(201,169,97,0.14))', border: '1px solid rgba(156,122,69,0.3)', borderRadius: 28 },
+  ctaBandTitle: { fontSize: 30, fontWeight: 800, marginBottom: 12, color: theme.text },
   ctaBandP: { fontSize: 16, color: theme.textDim, marginBottom: 26 },
 };
