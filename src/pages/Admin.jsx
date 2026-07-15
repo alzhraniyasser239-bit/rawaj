@@ -20,9 +20,20 @@ export default function Admin() {
   }, [loading, user, profile]);
 
   async function loadData() {
-    const { data: wr } = await supabase.from('wallet_requests').select('*, profiles(username)').order('created_at', { ascending: false }).limit(100);
+    const { data: wr, error: wrErr } = await supabase
+      .from('wallet_requests')
+      .select('*, profiles!wallet_requests_user_id_fkey(username)')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (wrErr) setMsg('خطأ في تحميل طلبات الشحن: ' + wrErr.message);
     setWalletReqs(wr || []);
-    const { data: ord } = await supabase.from('orders').select('*, profiles(username), services(name)').order('created_at', { ascending: false }).limit(100);
+
+    const { data: ord, error: ordErr } = await supabase
+      .from('orders')
+      .select('*, profiles(username), services(name)')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (ordErr) setMsg('خطأ في تحميل الطلبات: ' + ordErr.message);
     setOrders(ord || []);
   }
 
