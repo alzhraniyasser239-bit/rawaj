@@ -31,7 +31,6 @@ export default function Header() {
           <span style={s.logoEn}>RAWAJ</span>
         </Link>
 
-        {/* قائمة سطح المكتب */}
         <nav style={s.navDesktop} className="nav-desktop">
           {allLinks.map((l) => (
             <Link key={l.to} to={l.to}
@@ -62,7 +61,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* قائمة الجوال المنسدلة */}
       {open && (
         <div style={s.mobileMenu} className="mobile-menu">
           {allLinks.map((l) => (
@@ -77,7 +75,7 @@ export default function Header() {
           ) : (
             <>
               <Link to="/auth" onClick={() => setOpen(false)} style={s.mobileLink}>دخول</Link>
-              <Link to="/auth?mode=signup" onClick={() => setOpen(false)} style={{ ...s.mobileAuthBtn, background: theme.gradient, border: 'none' }}>حساب جديد</Link>
+              <Link to="/auth?mode=signup" onClick={() => setOpen(false)} style={{ ...s.mobileAuthBtn, background: theme.gradient, color: '#fff', border: 'none' }}>حساب جديد</Link>
             </>
           )}
         </div>
@@ -89,7 +87,7 @@ export default function Header() {
 const s = {
   header: {
     position: 'sticky', top: 0, zIndex: 50,
-    background: 'rgba(11,10,30,0.92)', backdropFilter: 'blur(16px)',
+    background: 'rgba(243,235,221,0.92)', backdropFilter: 'blur(16px)',
     borderBottom: `1px solid ${theme.border}`,
   },
   inner: {
@@ -101,18 +99,18 @@ const s = {
   logoEn: { fontSize: 9, letterSpacing: 4, color: theme.textFaint, fontWeight: 700 },
   navDesktop: { display: 'flex', gap: 4, alignItems: 'center' },
   link: { padding: '8px 12px', borderRadius: 10, fontSize: 14, fontWeight: 600, color: theme.textDim, whiteSpace: 'nowrap' },
-  linkActive: { color: '#fff', background: 'rgba(139,92,246,0.15)' },
-  adminLink: { color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' },
+  linkActive: { color: theme.text, background: 'rgba(156,122,69,0.18)' },
+  adminLink: { color: '#92400E', border: '1px solid rgba(146,64,14,0.35)' },
   actions: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 },
-  balancePill: { display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)', borderRadius: 12 },
-  balanceNum: { fontWeight: 800, fontSize: 14, color: '#c4b5fd' },
+  balancePill: { display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', background: 'rgba(156,122,69,0.16)', border: '1px solid rgba(156,122,69,0.35)', borderRadius: 12 },
+  balanceNum: { fontWeight: 800, fontSize: 14, color: '#7A5D33' },
   balanceCur: { fontSize: 11, color: theme.textDim },
-  ghostBtn: { padding: '9px 15px', borderRadius: 12, border: `1px solid ${theme.border}`, background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
+  ghostBtn: { padding: '9px 15px', borderRadius: 12, border: `1px solid ${theme.border}`, background: 'transparent', color: theme.text, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
   primaryBtn: { padding: '9px 16px', borderRadius: 12, border: 'none', background: theme.gradient, color: '#fff', fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap' },
-  burger: { display: 'none', background: 'rgba(255,255,255,0.06)', border: `1px solid ${theme.border}`, color: '#fff', fontSize: 20, width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  mobileMenu: { display: 'flex', flexDirection: 'column', gap: 4, padding: '12px 16px 20px', borderTop: `1px solid ${theme.border}`, background: 'rgba(11,10,30,0.98)' },
-  mobileLink: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 600, color: theme.textDim, background: 'rgba(255,255,255,0.03)' },
-  mobileLinkActive: { color: '#fff', background: 'rgba(139,92,246,0.15)' },
+  burger: { display: 'none', background: 'rgba(58,42,28,0.07)', border: `1px solid ${theme.border}`, color: theme.text, fontSize: 20, width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  mobileMenu: { display: 'flex', flexDirection: 'column', gap: 4, padding: '12px 16px 20px', borderTop: `1px solid ${theme.border}`, background: 'rgba(243,235,221,0.99)' },
+  mobileLink: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 600, color: theme.textDim, background: 'rgba(58,42,28,0.05)' },
+  mobileLinkActive: { color: theme.text, background: 'rgba(156,122,69,0.18)' },
   mobileDivider: { height: 1, background: theme.border, margin: '8px 0' },
-  mobileAuthBtn: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 700, color: '#fff', background: 'transparent', border: `1px solid ${theme.border}`, textAlign: 'center', width: '100%' },
+  mobileAuthBtn: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 700, color: theme.text, background: 'transparent', border: `1px solid ${theme.border}`, textAlign: 'center', width: '100%' },
 };
