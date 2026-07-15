@@ -40,13 +40,23 @@ export default function Admin() {
   useEffect(() => { if (profile?.role === 'admin') loadData(); }, [profile]);
 
   async function callAdmin(body) {
-    const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin---actions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-      body: JSON.stringify(body),
-    });
-    return res.json();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return { error: 'ما فيه جلسة — سجّل دخول مرة ثانية' };
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/admin---actions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify(body),
+      });
+      const raw = await res.text();
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return { error: `رد غير متوقع (${res.status}): ${raw.slice(0, 200)}` };
+      }
+    } catch (e) {
+      return { error: 'فشل الاتصال: ' + (e.message || e) };
+    }
   }
 
   async function approve(id) {
