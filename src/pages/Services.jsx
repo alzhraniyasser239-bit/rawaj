@@ -7,6 +7,65 @@ import { validateLink, platformLabel, targetHint } from '../lib/linkValidation';
 
 const PAGE_SIZE = 40;
 
+// ===== تصنيف المنصات =====
+const PLATFORMS = [
+  { key: 'tiktok',    label: 'تيك توك',   icon: '🎵', match: ['تيك توك', 'تيك توك', 'TikTok'] },
+  { key: 'instagram', label: 'انستقرام',  icon: '📸', match: ['انستقرام', 'انستگرام', 'Instagram', 'IG '] },
+  { key: 'snapchat',  label: 'سناب شات',  icon: '👻', match: ['سناب شات', 'سناب'] },
+  { key: 'youtube',   label: 'يوتيوب',    icon: '▶️', match: ['يوتيوب', 'YouTube'] },
+  { key: 'twitter',   label: 'تويتر / X', icon: '✖️', match: ['تويتر', 'Twitter'] },
+  { key: 'facebook',  label: 'فيسبوك',    icon: '👥', match: ['فيسبوك', 'Facebook'] },
+  { key: 'telegram',  label: 'تليجرام',   icon: '✈️', match: ['تليجرام', 'تليگرام', 'Telegram'] },
+  { key: 'whatsapp',  label: 'واتساب',    icon: '💬', match: ['وتساب', 'واتساب', 'WhatsApp'] },
+];
+
+const DEALS = { key: 'deals', label: 'الأرخص مبيعاً', icon: '🔥' };
+const OTHER = { key: 'other', label: 'منصات أخرى', icon: '🌐' };
+
+const PLATFORM_ORDER = ['tiktok', 'instagram', 'snapchat', 'youtube', 'twitter', 'facebook', 'telegram', 'whatsapp', 'other', 'deals'];
+
+// ===== تصنيف الأنواع =====
+const TYPES = [
+  { key: 'followers',    label: 'متابعين',   icon: '👤', match: ['متابعين', 'متابعة', 'مشتركين', 'اعضاء', 'أعضاء'] },
+  { key: 'likes',        label: 'لايكات',    icon: '👍', match: ['لايكات', 'لايكي', 'لايك', 'اعجابات', 'أعجابات', 'إعجاب', 'اعجاب', 'تكبيسات'] },
+  { key: 'views',        label: 'مشاهدات',   icon: '🎥', match: ['مشاهدات', 'مشاهده'] },
+  { key: 'comments',     label: 'تعليقات',   icon: '💬', match: ['تعليقات', 'تعليق'] },
+  { key: 'interactions', label: 'تفاعلات',   icon: '❤️', match: ['تفاعلات'] },
+  { key: 'story',        label: 'ستوري',     icon: '📖', match: ['ستوري', 'استوري', 'القصص'] },
+];
+
+const TYPE_ORDER = ['followers', 'likes', 'views', 'comments', 'interactions', 'story', 'other'];
+const OTHER_TYPE = { key: 'other', label: 'خدمات أخرى', icon: '✨' };
+
+function detectPlatform(category) {
+  const c = category || '';
+  if (c.includes('الأرخص مبيعاً')) return 'deals';
+  for (const p of PLATFORMS) {
+    if (p.match.some((m) => c.includes(m))) return p.key;
+  }
+  return 'other';
+}
+
+function detectType(category) {
+  const c = category || '';
+  const after = c.includes('|') ? c.split('|').slice(1).join('|') : c;
+  for (const t of TYPES) {
+    if (t.match.some((m) => after.includes(m))) return t.key;
+  }
+  return 'other';
+}
+
+function platformInfo(key) {
+  if (key === 'deals') return DEALS;
+  if (key === 'other') return OTHER;
+  return PLATFORMS.find((p) => p.key === key) || OTHER;
+}
+
+function typeInfo(key) {
+  if (key === 'other') return OTHER_TYPE;
+  return TYPES.find((t) => t.key === key) || OTHER_TYPE;
+}
+
 function timeLabel(mins) {
   if (!mins || mins <= 0) return null;
   if (mins < 60) return `${mins} دقيقة`;
@@ -21,16 +80,15 @@ export default function Services() {
   const { user, profile, refreshProfile } = useAuth();
   const nav = useNavigate();
   const [services, setServices] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [activeCat, setActiveCat] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [activePlatform, setActivePlatform] = useState(null);
+  const [activeType, setActiveType] = useState(null);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      // جلب كل الخدمات على دفعات (Supabase يحد بـ 1000 لكل استعلام)
       let all = [];
       let from = 0;
       const step = 1000;
@@ -46,78 +104,169 @@ export default function Services() {
         if (data.length < step) break;
         from += step;
       }
-      setServices(all);
-      const cats = [...new Set(all.map((x) => x.category))].filter(Boolean);
-      setCategories(cats);
+      // نضيف المنصة والنوع لكل خدمة مرة وحدة
+      const tagged = all.map((x) => ({
+        ...x,
+        _platform: detectPlatform(x.category),
+        _type: detectType(x.category),
+      }));
+      setServices(tagged);
       setLoading(false);
     })();
   }, []);
 
+  // عدد الخدمات لكل منصة
+  const platformCounts = useMemo(() => {
+    const counts = {};
+    services.forEach((x) => { counts[x._platform] = (counts[x._platform] || 0) + 1; });
+    return counts;
+  }, [services]);
+
+  const platformList = useMemo(
+    () => PLATFORM_ORDER.filter((k) => platformCounts[k] > 0),
+    [platformCounts]
+  );
+
+  // خدمات المنصة المختارة
+  const platformServices = useMemo(
+    () => (activePlatform ? services.filter((x) => x._platform === activePlatform) : []),
+    [services, activePlatform]
+  );
+
+  // عدد الخدمات لكل نوع داخل المنصة
+  const typeCounts = useMemo(() => {
+    const counts = {};
+    platformServices.forEach((x) => { counts[x._type] = (counts[x._type] || 0) + 1; });
+    return counts;
+  }, [platformServices]);
+
+  const typeList = useMemo(
+    () => TYPE_ORDER.filter((k) => typeCounts[k] > 0),
+    [typeCounts]
+  );
+
   const filtered = useMemo(() => {
-    if (activeCat === 'all') return services;
-    return services.filter((x) => x.category === activeCat);
-  }, [services, activeCat]);
+    if (!activePlatform) return [];
+    if (!activeType) return platformServices;
+    return platformServices.filter((x) => x._type === activeType);
+  }, [platformServices, activeType, activePlatform]);
 
   const paged = filtered.slice(0, page * PAGE_SIZE);
+
+  function pickPlatform(key) {
+    setActivePlatform(key);
+    setActiveType(null);
+    setPage(1);
+  }
+
+  function pickType(key) {
+    setActiveType(key === activeType ? null : key);
+    setPage(1);
+  }
+
+  function resetAll() {
+    setActivePlatform(null);
+    setActiveType(null);
+    setPage(1);
+  }
+
+  const pInfo = activePlatform ? platformInfo(activePlatform) : null;
 
   return (
     <div style={s.wrap}>
       <div style={s.head}>
         <h1 style={s.title}>الخدمات</h1>
-        <p style={s.sub}>{services.length.toLocaleString('ar')} خدمة متاحة — اختر ما يناسبك وابدأ فوراً</p>
-      </div>
-
-      <div style={s.catRow}>
-        <button style={{ ...s.catChip, ...(activeCat === 'all' ? s.catActive : {}) }} onClick={() => { setActiveCat('all'); setPage(1); }}>
-          الكل ({services.length})
-        </button>
-        {categories.map((c) => (
-          <button key={c} style={{ ...s.catChip, ...(activeCat === c ? s.catActive : {}) }} onClick={() => { setActiveCat(c); setPage(1); }}>
-            {c}
-          </button>
-        ))}
+        <p style={s.sub}>{services.length.toLocaleString('ar')} خدمة متاحة — اختر المنصة وابدأ فوراً</p>
       </div>
 
       {loading ? (
-        <div style={s.center}><span className="spinner" /> جاري تحميل كل الخدمات...</div>
+        <div style={s.center}><span className="spinner" /> جاري تحميل الخدمات...</div>
       ) : (
         <>
-          <div style={s.grid} className="grid-services">
-            {paged.map((svc) => {
-              const t = timeLabel(svc.avg_time_min);
-              return (
-                <div key={svc.id} style={s.card}>
-                  <div style={s.cardTop}>
-                    <div style={s.cardCat}>{svc.category}</div>
-                    {svc.refill && <div style={s.refillBadge}>♻️ تعويض</div>}
-                  </div>
-                  <h3 style={s.cardName}>{svc.name}</h3>
-                  <div style={s.cardMeta}>
-                    <span>الحد: {svc.min_order?.toLocaleString('ar')} - {svc.max_order?.toLocaleString('ar')}</span>
-                    {t && <span style={s.timeChip}>⏱ {t}</span>}
-                  </div>
-                  <div style={s.cardFoot}>
-                    <div style={s.price}>
-                      <span style={s.priceNum}>{Number(svc.sell_price_sar).toFixed(2)}</span>
-                      <span style={s.priceCur}>ر.س / 1000</span>
-                    </div>
-                    <button style={s.orderBtn} onClick={() => user ? setSelected(svc) : nav('/auth')}>
-                      اطلب
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {paged.length < filtered.length && (
-            <div style={s.center}>
-              <button style={s.moreBtn} onClick={() => setPage(page + 1)}>
-                عرض المزيد ({filtered.length - paged.length} متبقية)
-              </button>
+          {/* المستوى الأول: المنصات */}
+          {!activePlatform && (
+            <div style={s.platGrid}>
+              {platformList.map((k) => {
+                const info = platformInfo(k);
+                return (
+                  <button key={k} style={s.platCard} onClick={() => pickPlatform(k)}>
+                    <span style={s.platIcon}>{info.icon}</span>
+                    <span style={s.platLabel}>{info.label}</span>
+                    <span style={s.platCount}>{platformCounts[k].toLocaleString('ar')} خدمة</span>
+                  </button>
+                );
+              })}
             </div>
           )}
-          {filtered.length === 0 && <div style={s.center}>لا توجد خدمات في هذا التصنيف.</div>}
+
+          {/* المستوى الثاني: الأنواع */}
+          {activePlatform && (
+            <>
+              <div style={s.breadcrumb}>
+                <button style={s.backBtn} onClick={resetAll}>← كل المنصات</button>
+                <span style={s.crumbNow}>{pInfo.icon} {pInfo.label}</span>
+              </div>
+
+              <div style={s.typeRow}>
+                <button
+                  style={{ ...s.typeChip, ...(!activeType ? s.typeActive : {}) }}
+                  onClick={() => pickType(null)}
+                >
+                  الكل ({platformServices.length.toLocaleString('ar')})
+                </button>
+                {typeList.map((k) => {
+                  const info = typeInfo(k);
+                  return (
+                    <button
+                      key={k}
+                      style={{ ...s.typeChip, ...(activeType === k ? s.typeActive : {}) }}
+                      onClick={() => pickType(k)}
+                    >
+                      {info.icon} {info.label} ({typeCounts[k].toLocaleString('ar')})
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* المستوى الثالث: الخدمات */}
+              <div style={s.grid} className="grid-services">
+                {paged.map((svc) => {
+                  const t = timeLabel(svc.avg_time_min);
+                  return (
+                    <div key={svc.id} style={s.card}>
+                      <div style={s.cardTop}>
+                        <div style={s.cardCat}>{svc.category}</div>
+                        {svc.refill && <div style={s.refillBadge}>♻️ تعويض</div>}
+                      </div>
+                      <h3 style={s.cardName}>{svc.name}</h3>
+                      <div style={s.cardMeta}>
+                        <span>الحد: {svc.min_order?.toLocaleString('ar')} - {svc.max_order?.toLocaleString('ar')}</span>
+                        {t && <span style={s.timeChip}>⏱ {t}</span>}
+                      </div>
+                      <div style={s.cardFoot}>
+                        <div style={s.price}>
+                          <span style={s.priceNum}>{Number(svc.sell_price_sar).toFixed(2)}</span>
+                          <span style={s.priceCur}>ر.س / 1000</span>
+                        </div>
+                        <button style={s.orderBtn} onClick={() => user ? setSelected(svc) : nav('/auth')}>
+                          اطلب
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {paged.length < filtered.length && (
+                <div style={s.center}>
+                  <button style={s.moreBtn} onClick={() => setPage(page + 1)}>
+                    عرض المزيد ({(filtered.length - paged.length).toLocaleString('ar')} متبقية)
+                  </button>
+                </div>
+              )}
+              {filtered.length === 0 && <div style={s.center}>لا توجد خدمات هنا.</div>}
+            </>
+          )}
         </>
       )}
 
@@ -232,9 +381,21 @@ const s = {
   head: { marginBottom: 24 },
   title: { fontSize: 38, fontWeight: 800 },
   sub: { color: theme.textDim, fontSize: 16, marginTop: 6 },
-  catRow: { display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28, maxHeight: 130, overflowY: 'auto', padding: 4 },
-  catChip: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
-  catActive: { background: theme.gradient, color: '#fff', border: '1px solid transparent' },
+
+  platGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14, marginBottom: 20 },
+  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '26px 14px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, cursor: 'pointer' },
+  platIcon: { fontSize: 34 },
+  platLabel: { fontSize: 16, fontWeight: 800, color: '#fff' },
+  platCount: { fontSize: 12, color: theme.textFaint },
+
+  breadcrumb: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, flexWrap: 'wrap' },
+  backBtn: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600 },
+  crumbNow: { fontSize: 18, fontWeight: 800, color: '#c4b5fd' },
+
+  typeRow: { display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 },
+  typeChip: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
+  typeActive: { background: theme.gradient, color: '#fff', border: '1px solid transparent' },
+
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 },
   card: { display: 'flex', flexDirection: 'column', padding: 20, background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18 },
   cardTop: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 },
