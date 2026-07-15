@@ -26,14 +26,14 @@ export default function Footer() {
         </div>
       </div>
       <div style={s.bottom}>
-        <span>© {new Date().getFullYear()} رواج — جميع الحقوق محفوظة</span>
+        <span>©️ {new Date().getFullYear()} رواج — جميع الحقوق محفوظة</span>
       </div>
     </footer>
   );
 }
 
 const s = {
-  footer: { borderTop: `1px solid ${theme.border}`, background: '#08071a', marginTop: 80 },
+  footer: { borderTop: `1px solid ${theme.border}`, background: '#DCCFBB', marginTop: 80, color: theme.text },
   inner: {
     maxWidth: 1200, margin: '0 auto', padding: '50px 20px 30px',
     display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 40,
@@ -44,7 +44,7 @@ const s = {
     background: theme.gradientText, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
   },
   desc: { color: theme.textDim, fontSize: 14, lineHeight: 1.9, maxWidth: 340 },
-  h4: { fontSize: 15, fontWeight: 700, marginBottom: 6 },
+  h4: { fontSize: 15, fontWeight: 700, marginBottom: 6, color: theme.text },
   flink: { color: theme.textDim, fontSize: 14, padding: '3px 0' },
   bottom: {
     borderTop: `1px solid ${theme.border}`, padding: '20px', textAlign: 'center',
