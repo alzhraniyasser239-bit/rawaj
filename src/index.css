@@ -16,7 +16,7 @@ input, textarea, select { font-family: inherit; }
 ::-webkit-scrollbar-thumb { background: rgba(69,51,37,0.45); border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(69,51,37,0.7); }
 @keyframes spin { to { transform: rotate(360deg); } }
-.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(58,42,28,0.25); border-top-color: #3A2A1C; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
 
 /* ===== الجوال ===== */
 .burger-btn { display: none !important; }
