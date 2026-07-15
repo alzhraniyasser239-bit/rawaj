@@ -51,7 +51,6 @@ export default function Auth() {
     setLoading(true);
     try {
       if (mode === 'signup') {
-        // تأكد إن اسم المستخدم غير محجوز
         const { data: existing } = await supabase
           .from('profiles').select('id').eq('username', username.trim()).maybeSingle();
         if (existing) { setLoading(false); return setError('اسم المستخدم محجوز، اختر غيره'); }
@@ -63,7 +62,6 @@ export default function Auth() {
             id: data.user.id, username: username.trim(), balance_sar: 0, role: 'user',
           });
         }
-        // بعض إعدادات Supabase تتطلب تأكيد البريد
         if (data.session) nav('/dashboard');
         else { setInfo('تم إنشاء حسابك! إذا طُلب تأكيد البريد، تحقق من إيميلك ثم سجّل الدخول.'); setMode('login'); }
       } else {
@@ -146,26 +144,26 @@ export default function Auth() {
 }
 
 const s = {
-  page: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 20% 20%, #1e1b4b, #0f0a2e 60%, #080618)', position: 'relative', overflow: 'hidden', padding: 20 },
-  orb1: { position: 'absolute', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.5), transparent 70%)', top: -80, right: -60, filter: 'blur(40px)' },
-  orb2: { position: 'absolute', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)', bottom: -120, left: -80, filter: 'blur(50px)' },
-  card: { position: 'relative', width: '100%', maxWidth: 400, background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 28, padding: '40px 32px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' },
+  page: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at 20% 20%, #EFE5D6, #E5D9C7 60%, #DCCFBB)', position: 'relative', overflow: 'hidden', padding: 20 },
+  orb1: { position: 'absolute', width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(156,122,69,0.28), transparent 70%)', top: -80, right: -60, filter: 'blur(40px)' },
+  orb2: { position: 'absolute', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(201,169,97,0.25), transparent 70%)', bottom: -120, left: -80, filter: 'blur(50px)' },
+  card: { position: 'relative', width: '100%', maxWidth: 400, background: 'rgba(250,245,236,0.85)', backdropFilter: 'blur(20px)', border: `1px solid ${theme.border}`, borderRadius: 28, padding: '40px 32px', boxShadow: '0 20px 50px rgba(58,42,28,0.15)' },
   brand: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 },
-  logoAr: { fontSize: 42, fontWeight: 800, background: 'linear-gradient(135deg,#a78bfa,#60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  logoEn: { fontSize: 12, letterSpacing: 8, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
-  tagline: { textAlign: 'center', color: 'rgba(255,255,255,0.55)', fontSize: 14, margin: '10px 0 28px' },
-  tabs: { display: 'flex', background: 'rgba(0,0,0,0.25)', borderRadius: 14, padding: 4, marginBottom: 22 },
-  tab: { flex: 1, padding: '11px 0', border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: 600, borderRadius: 10, transition: 'all 0.2s' },
-  tabActive: { background: 'linear-gradient(135deg,#8b5cf6,#6366f1)', color: '#fff', boxShadow: '0 4px 14px rgba(139,92,246,0.4)' },
+  logoAr: { fontSize: 42, fontWeight: 800, background: theme.gradientText, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  logoEn: { fontSize: 12, letterSpacing: 8, color: theme.textFaint, fontWeight: 600 },
+  tagline: { textAlign: 'center', color: theme.textDim, fontSize: 14, margin: '10px 0 28px' },
+  tabs: { display: 'flex', background: 'rgba(58,42,28,0.07)', borderRadius: 14, padding: 4, marginBottom: 22 },
+  tab: { flex: 1, padding: '11px 0', border: 'none', background: 'transparent', color: theme.textDim, fontSize: 15, fontWeight: 600, borderRadius: 10, transition: 'all 0.2s' },
+  tabActive: { background: theme.gradient, color: '#fff', boxShadow: '0 4px 12px rgba(122,93,51,0.28)' },
   resetHead: { marginBottom: 18 },
-  backBtn: { background: 'none', border: 'none', color: '#a78bfa', fontSize: 14, fontWeight: 600, padding: 0, marginBottom: 10 },
-  resetDesc: { color: 'rgba(255,255,255,0.6)', fontSize: 14, lineHeight: 1.8 },
-  input: { width: '100%', boxSizing: 'border-box', padding: '14px 16px', marginBottom: 14, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, color: '#fff', fontSize: 15, outline: 'none' },
+  backBtn: { background: 'none', border: 'none', color: '#9C7A45', fontSize: 14, fontWeight: 700, padding: 0, marginBottom: 10 },
+  resetDesc: { color: theme.textDim, fontSize: 14, lineHeight: 1.8 },
+  input: { width: '100%', boxSizing: 'border-box', padding: '14px 16px', marginBottom: 14, background: 'rgba(58,42,28,0.05)', border: `1px solid ${theme.border}`, borderRadius: 14, color: theme.text, fontSize: 15, outline: 'none' },
   forgotRow: { textAlign: 'left', marginBottom: 14, marginTop: -2 },
-  forgotLink: { color: '#a78bfa', fontSize: 13, fontWeight: 600, cursor: 'pointer' },
-  error: { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', padding: '10px 14px', borderRadius: 12, fontSize: 13, marginBottom: 14, textAlign: 'center', lineHeight: 1.7 },
-  infoBox: { background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', color: '#86efac', padding: '10px 14px', borderRadius: 12, fontSize: 13, marginBottom: 14, textAlign: 'center', lineHeight: 1.8 },
-  submit: { width: '100%', padding: '15px 0', border: 'none', borderRadius: 14, background: 'linear-gradient(135deg,#8b5cf6,#6366f1)', color: '#fff', fontSize: 16, fontWeight: 700, boxShadow: '0 8px 24px rgba(139,92,246,0.35)', marginTop: 6, minHeight: 52 },
-  switch: { textAlign: 'center', color: 'rgba(255,255,255,0.5)', fontSize: 14, marginTop: 22 },
-  switchLink: { color: '#a78bfa', fontWeight: 700, cursor: 'pointer' },
+  forgotLink: { color: '#9C7A45', fontSize: 13, fontWeight: 700, cursor: 'pointer' },
+  error: { background: 'rgba(185,28,28,0.10)', border: '1px solid rgba(185,28,28,0.3)', color: '#991B1B', padding: '10px 14px', borderRadius: 12, fontSize: 13, marginBottom: 14, textAlign: 'center', lineHeight: 1.7 },
+  infoBox: { background: 'rgba(21,128,61,0.10)', border: '1px solid rgba(21,128,61,0.3)', color: '#166534', padding: '10px 14px', borderRadius: 12, fontSize: 13, marginBottom: 14, textAlign: 'center', lineHeight: 1.8 },
+  submit: { width: '100%', padding: '15px 0', border: 'none', borderRadius: 14, background: theme.gradient, color: '#fff', fontSize: 16, fontWeight: 700, boxShadow: '0 8px 20px rgba(122,93,51,0.25)', marginTop: 6, minHeight: 52 },
+  switch: { textAlign: 'center', color: theme.textDim, fontSize: 14, marginTop: 22 },
+  switchLink: { color: '#9C7A45', fontWeight: 700, cursor: 'pointer' },
 };
