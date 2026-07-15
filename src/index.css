@@ -1,10 +1,10 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-:root { color-scheme: dark; }
+:root { color-scheme: light; }
 html, body { max-width: 100%; overflow-x: hidden; }
 body {
   font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
-  background: #0b0a1e;
-  color: #fff;
+  background: #E5D9C7;
+  color: #3A2A1C;
   direction: rtl;
   -webkit-font-smoothing: antialiased;
 }
@@ -12,9 +12,9 @@ a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 input, textarea, select { font-family: inherit; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #0b0a1e; }
-::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 5px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.6); }
+::-webkit-scrollbar-track { background: #E5D9C7; }
+::-webkit-scrollbar-thumb { background: rgba(69,51,37,0.45); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(69,51,37,0.7); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
 
