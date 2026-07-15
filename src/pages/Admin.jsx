@@ -41,7 +41,7 @@ export default function Admin() {
 
   async function callAdmin(body) {
     const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin-actions`, {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/admin---actions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
       body: JSON.stringify(body),
