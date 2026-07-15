@@ -1,18 +1,18 @@
-// نظام الألوان والتصميم لموقع رواج
+// نظام الألوان والتصميم لموقع رواج — بيج رملي دافئ
 export const theme = {
-  bg: '#0b0a1e',
-  bgCard: 'rgba(255,255,255,0.04)',
-  bgElev: '#151332',
-  primary: '#8b5cf6',
-  primary2: '#6366f1',
-  accent: '#60a5fa',
-  text: '#ffffff',
-  textDim: 'rgba(255,255,255,0.6)',
-  textFaint: 'rgba(255,255,255,0.4)',
-  border: 'rgba(255,255,255,0.1)',
-  gradient: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-  gradientText: 'linear-gradient(135deg, #a78bfa, #60a5fa)',
-  success: '#22c55e',
-  danger: '#ef4444',
-  warning: '#f59e0b',
+  bg: '#CEBDAB',                    // بيج رملي — خلفية الموقع
+  bgCard: '#BFA88F',                // بني فاتح — الكروت والخانات
+  bgElev: '#DDD1C0',                // بيج أفتح — النوافذ المنبثقة
+  primary: '#8B5E3C',               // بني دافئ — الأزرار الأساسية
+  primary2: '#6F4A2E',              // بني غامق
+  accent: '#A0522D',                // بني محمر — لمسات
+  text: '#3A2E24',                  // بني غامق جداً — النصوص
+  textDim: 'rgba(58,46,36,0.65)',
+  textFaint: 'rgba(58,46,36,0.45)',
+  border: 'rgba(58,46,36,0.20)',
+  gradient: 'linear-gradient(135deg, #8B5E3C, #6F4A2E)',
+  gradientText: 'linear-gradient(135deg, #6F4A2E, #A0522D)',
+  success: '#2E7D32',
+  danger: '#C62828',
+  warning: '#B26A00',
 };
