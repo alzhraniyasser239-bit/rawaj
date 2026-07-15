@@ -33,6 +33,24 @@ const POST_PATTERNS = {
 const STORY_PATTERNS = { instagram: ['/stories/'] };
 const REEL_PATTERNS = { instagram: ['/reel/','/reels/'], tiktok: ['/video/'], facebook: ['/reel/'], youtube: ['/shorts/'] };
 
+// ✅ جديد: تنظيف الرابط وإضافة https:// تلقائياً
+// يقبل: www.tiktok.com/@x  |  tiktok.com/@x  |  https://www.tiktok.com/@x
+export function normalizeLink(link) {
+  let s = (link || '').trim();
+  if (!s) return '';
+  // شيل المسافات الزايدة والأحرف العربية للأرقام لو وجدت
+  s = s.replace(/\s+/g, '');
+  // لو ما فيه بروتوكول، ضيف https://
+  if (!/^https?:\/\//i.test(s)) {
+    // شيل // أو / في البداية لو موجودة
+    s = s.replace(/^\/+/, '');
+    s = 'https://' + s;
+  }
+  // وحّد http إلى https
+  s = s.replace(/^http:\/\//i, 'https://');
+  return s;
+}
+
 export function detectPlatform(text) {
   const t = (text || '').toLowerCase();
   for (const p of PLATFORMS) {
@@ -63,14 +81,16 @@ function telegramIsPost(link) {
 }
 
 export function validateLink(service, link) {
-  const raw = (link || '').trim();
-  if (!/^https?:\/\/.+\..+/i.test(raw)) {
-    return { ok: false, message: 'الرابط لازم يبدأ بـ https:// ويكون رابط صحيح' };
+  // ✅ ننظّف الرابط أول ونضيف https:// لو ناقص
+  const raw = normalizeLink(link);
+
+  if (!/^https:\/\/[^/\s]+\.[^/\s]{2,}/i.test(raw)) {
+    return { ok: false, message: 'اكتب رابط صحيح، مثل: tiktok.com/@اسمك' };
   }
 
   const txt = `${service.name} ${service.category}`;
   const platform = detectPlatform(txt);
-  if (!platform) return { ok: true }; // ما عرفنا المنصة - نكتفي بالتحقق الأساسي
+  if (!platform) return { ok: true, link: raw }; // ما عرفنا المنصة - نكتفي بالتحقق الأساسي
 
   const l = raw.toLowerCase();
   if (!platform.hosts.some((h) => l.includes(h))) {
@@ -88,7 +108,7 @@ export function validateLink(service, link) {
     if (target === 'post' && !isPost) {
       return { ok: false, message: 'هذي الخدمة تحتاج رابط منشور محدد في القناة (رابط الرسالة)، مو رابط القناة.' };
     }
-    return { ok: true };
+    return { ok: true, link: raw };
   }
 
   // ستوري
@@ -96,7 +116,7 @@ export function validateLink(service, link) {
     if (!hasAny(raw, STORY_PATTERNS[platform.key] || [])) {
       return { ok: false, message: `هذي خدمة ستوري — لازم تحط رابط الستوري نفسه.` };
     }
-    return { ok: true };
+    return { ok: true, link: raw };
   }
 
   // ريل
@@ -104,7 +124,7 @@ export function validateLink(service, link) {
     if (!hasAny(raw, REEL_PATTERNS[platform.key] || [])) {
       return { ok: false, message: `هذي خدمة ريلز — لازم تحط رابط الريل نفسه.` };
     }
-    return { ok: true };
+    return { ok: true, link: raw };
   }
 
   // منشور عام (لايك/مشاهدة/تعليق)
@@ -116,7 +136,7 @@ export function validateLink(service, link) {
     return { ok: false, message: 'هذي الخدمة تحتاج رابط الحساب (البروفايل)، مو رابط منشور. حط رابط حسابك مباشرة.' };
   }
 
-  return { ok: true };
+  return { ok: true, link: raw };
 }
 
 export function platformLabel(service) {
