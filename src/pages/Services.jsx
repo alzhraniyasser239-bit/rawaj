@@ -89,21 +89,35 @@ export default function Services() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let all = [];
-      let from = 0;
-      const step = 1000;
-      while (true) {
-        const { data, error } = await supabase
-          .from('services')
-          .select('*')
-          .eq('is_active', true)
-          .order('category', { ascending: true })
-          .range(from, from + step - 1);
-        if (error || !data || data.length === 0) break;
-        all = all.concat(data);
-        if (data.length < step) break;
-        from += step;
+      // الأعمدة اللي نحتاجها فقط (بدون سعر التكلفة والوصف) = أسرع وأأمن
+      const COLS = 'id, name, category, min_order, max_order, sell_price_sar, refill, avg_time_min';
+      const STEP = 1000;
+
+      // نجيب العدد أول عشان نعرف كم دفعة
+      const { count } = await supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_active', true);
+
+      const total = count || 0;
+      const pages = Math.max(1, Math.ceil(total / STEP));
+
+      // نطلق كل الدفعات بالتوازي بدل ما ننتظر وحدة ورا الثانية
+      const requests = [];
+      for (let i = 0; i < pages; i++) {
+        requests.push(
+          supabase
+            .from('services')
+            .select(COLS)
+            .eq('is_active', true)
+            .order('category', { ascending: true })
+            .range(i * STEP, i * STEP + STEP - 1)
+        );
       }
+
+      const results = await Promise.all(requests);
+      const all = results.flatMap((r) => r.data || []);
+
       // نضيف المنصة والنوع لكل خدمة مرة وحدة
       const tagged = all.map((x) => ({
         ...x,
@@ -301,6 +315,7 @@ function OrderModal({ service, balance, onClose, onDone }) {
 
     const check = validateLink(service, link);
     if (!check.ok) return setError(check.message);
+    const finalLink = check.link || link.trim();
 
     if (qty < service.min_order || qty > service.max_order) return setError(`الكمية لازم بين ${service.min_order} و ${service.max_order}`);
     if (!enough) return setError('رصيدك غير كافٍ، اشحن رصيدك أولاً');
@@ -313,7 +328,7 @@ function OrderModal({ service, balance, onClose, onDone }) {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/place-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ user_id: session.user.id, service_id: service.id, target_link: link.trim(), quantity: qty }),
+        body: JSON.stringify({ user_id: session.user.id, service_id: service.id, target_link: finalLink, quantity: qty }),
       });
 
       let out;
@@ -357,7 +372,7 @@ function OrderModal({ service, balance, onClose, onDone }) {
             )}
             {t && <div style={m.timeHint}>⏱ متوسط وقت التنفيذ: {t}</div>}
             <label style={m.label}>{tHint || 'رابط الحساب / المنشور'}</label>
-            <input style={m.input} placeholder="https://..." value={link} onChange={(e) => setLink(e.target.value)} dir="ltr" />
+            <input style={m.input} placeholder="مثال: tiktok.com/@اسمك" value={link} onChange={(e) => setLink(e.target.value)} dir="ltr" />
             <label style={m.label}>الكمية (بين {service.min_order} و {service.max_order})</label>
             <input style={m.input} type="number" value={qty} onChange={(e) => setQty(parseInt(e.target.value) || 0)} dir="ltr" />
             <div style={m.summary}>
