@@ -31,8 +31,8 @@ export default function Home() {
   const [serviceCount, setServiceCount] = useState(4000);
 
   useEffect(() => {
-    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed')
-      .then(({ count }) => { if (count != null) setOrderCount(count); });
+    supabase.rpc('completed_orders_count')
+  .then(({ data }) => { if (data != null) setOrderCount(Number(data)); });
     supabase.from('services').select('id', { count: 'exact', head: true }).eq('is_active', true)
       .then(({ count }) => { if (count != null) setServiceCount(count); });
   }, []);
