@@ -159,10 +159,15 @@ export default function Services() {
     [typeCounts]
   );
 
+  // الفلترة + الترتيب من الأرخص للأغلى
   const filtered = useMemo(() => {
     if (!activePlatform) return [];
-    if (!activeType) return platformServices;
-    return platformServices.filter((x) => x._type === activeType);
+    const list = !activeType
+      ? platformServices
+      : platformServices.filter((x) => x._type === activeType);
+    return [...list].sort(
+      (a, b) => Number(a.sell_price_sar) - Number(b.sell_price_sar)
+    );
   }, [platformServices, activeType, activePlatform]);
 
   const paged = filtered.slice(0, page * PAGE_SIZE);
@@ -219,6 +224,7 @@ export default function Services() {
               <div style={s.breadcrumb}>
                 <button style={s.backBtn} onClick={resetAll}>← كل المنصات</button>
                 <span style={s.crumbNow}>{pInfo.icon} {pInfo.label}</span>
+                <span style={s.sortNote}>مرتّبة من الأرخص للأغلى</span>
               </div>
 
               <div style={s.typeRow}>
@@ -406,6 +412,7 @@ const s = {
   breadcrumb: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, flexWrap: 'wrap' },
   backBtn: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600 },
   crumbNow: { fontSize: 18, fontWeight: 800, color: '#5C4432' },
+  sortNote: { fontSize: 12, color: theme.textFaint, padding: '5px 12px', borderRadius: 100, background: 'rgba(156,122,69,0.10)' },
 
   typeRow: { display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 },
   typeChip: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
