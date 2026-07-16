@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { theme } from '../theme';
+import ReviewsSection from '../components/ReviewsSection';
 
 const features = [
   { icon: '⚡', title: 'تنفيذ فوري', desc: 'أغلب الطلبات تبدأ خلال دقائق.' },
@@ -30,7 +31,7 @@ export default function Home() {
   const [serviceCount, setServiceCount] = useState(4000);
 
   useEffect(() => {
-    supabase.from('orders').select('id', { count: 'exact', head: true })
+    supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed')
       .then(({ count }) => { if (count != null) setOrderCount(count); });
     supabase.from('services').select('id', { count: 'exact', head: true }).eq('is_active', true)
       .then(({ count }) => { if (count != null) setServiceCount(count); });
@@ -115,6 +116,9 @@ export default function Home() {
           {user ? 'تصفّح الخدمات' : 'أنشئ حسابك الآن'}
         </Link>
       </section>
+
+      {/* Reviews */}
+      <ReviewsSection />
     </div>
   );
 }
