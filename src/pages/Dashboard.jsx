@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
+import ReviewModal from '../components/ReviewModal';
 
 const statusMap = {
   pending: { label: 'قيد الانتظار', color: '#f59e0b' },
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const nav = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [reviewedIds, setReviewedIds] = useState([]);
+  const [reviewOrder, setReviewOrder] = useState(null);
 
   useEffect(() => {
     if (!loading && !user) nav('/auth');
@@ -34,8 +37,19 @@ export default function Dashboard() {
         .limit(50);
       setOrders(data || []);
       setLoadingOrders(false);
+
+      const { data: myReviews } = await supabase
+        .from('reviews')
+        .select('order_id')
+        .eq('user_id', user.id);
+      setReviewedIds((myReviews || []).map((r) => r.order_id));
     })();
   }, [user]);
+
+  function handleReviewClose(done) {
+    if (done && reviewOrder) setReviewedIds((prev) => [...prev, reviewOrder.id]);
+    setReviewOrder(null);
+  }
 
   if (loading || !user) return <div style={s.center}><span className="spinner" /></div>;
 
@@ -79,11 +93,13 @@ export default function Dashboard() {
                 <th style={s.th}>التكلفة</th>
                 <th style={s.th}>الحالة</th>
                 <th style={s.th}>التاريخ</th>
+                <th style={s.th}>التقييم</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((o) => {
                 const st = statusMap[o.status] || statusMap.pending;
+                const reviewed = reviewedIds.includes(o.id);
                 return (
                   <tr key={o.id} style={s.tr}>
                     <td style={s.td}>{o.id}</td>
@@ -92,12 +108,27 @@ export default function Dashboard() {
                     <td style={s.td}>{Number(o.charged_sar).toFixed(2)} ر.س</td>
                     <td style={s.td}><span style={{ ...s.badge, color: st.color, background: `${st.color}22` }}>{st.label}</span></td>
                     <td style={s.td}>{new Date(o.created_at).toLocaleDateString('ar-SA')}</td>
+                    <td style={s.td}>
+                      {o.status !== 'completed' ? (
+                        <span style={s.dash}>—</span>
+                      ) : reviewed ? (
+                        <span style={s.done}>★ تم التقييم</span>
+                      ) : (
+                        <button type="button" onClick={() => setReviewOrder(o)} style={s.rateBtn}>
+                          قيّم الخدمة
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
+      )}
+
+      {reviewOrder && (
+        <ReviewModal order={reviewOrder} userId={user.id} onClose={handleReviewClose} />
       )}
     </div>
   );
@@ -119,10 +150,24 @@ const s = {
   empty: { textAlign: 'center', padding: '50px 20px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, color: theme.textDim },
   emptyBtn: { display: 'inline-block', marginTop: 16, padding: '11px 24px', borderRadius: 12, background: theme.gradient, color: '#fff', fontWeight: 700 },
   tableWrap: { overflowX: 'auto', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20 },
-  table: { width: '100%', borderCollapse: 'collapse', minWidth: 700 },
+  table: { width: '100%', borderCollapse: 'collapse', minWidth: 800 },
   th: { textAlign: 'right', padding: '16px 18px', fontSize: 13, color: theme.textDim, fontWeight: 700, borderBottom: `1px solid ${theme.border}`, whiteSpace: 'nowrap' },
   tr: {},
   td: { padding: '14px 18px', fontSize: 14, borderBottom: `1px solid ${theme.border}` },
   svcCell: { display: 'block', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badge: { padding: '5px 12px', borderRadius: 100, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' },
+  rateBtn: {
+    padding: '7px 14px',
+    borderRadius: 10,
+    border: '1px solid rgba(156,122,69,0.4)',
+    background: 'rgba(156,122,69,0.12)',
+    color: '#9C7A45',
+    fontSize: 13,
+    fontWeight: 700,
+    fontFamily: 'inherit',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  done: { fontSize: 13, color: '#C9A961', fontWeight: 700, whiteSpace: 'nowrap' },
+  dash: { color: theme.textDim },
 };
