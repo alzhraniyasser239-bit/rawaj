@@ -18,11 +18,16 @@ const steps = [
   { n: '3', title: 'اطلب الخدمة', desc: 'اختر من آلاف الخدمات وابدأ.' },
 ];
 
+// المفاتيح مطابقة لصفحة الخدمات
 const platforms = [
-  { name: 'انستقرام', emoji: '📸' }, { name: 'تيك توك', emoji: '🎵' },
-  { name: 'تويتر / X', emoji: '🐦' }, { name: 'تليجرام', emoji: '📱' },
-  { name: 'يوتيوب', emoji: '🎬' }, { name: 'فيسبوك', emoji: '📘' },
-  { name: 'سناب شات', emoji: '👻' }, { name: 'المزيد', emoji: '✨' },
+  { key: 'instagram', name: 'انستقرام', emoji: '📸' },
+  { key: 'tiktok', name: 'تيك توك', emoji: '🎵' },
+  { key: 'twitter', name: 'تويتر / X', emoji: '✖️' },
+  { key: 'telegram', name: 'تليجرام', emoji: '✈️' },
+  { key: 'youtube', name: 'يوتيوب', emoji: '▶️' },
+  { key: 'facebook', name: 'فيسبوك', emoji: '👥' },
+  { key: 'snapchat', name: 'سناب شات', emoji: '👻' },
+  { key: null, name: 'المزيد', emoji: '✨' },
 ];
 
 export default function Home() {
@@ -32,7 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     supabase.rpc('completed_orders_count')
-  .then(({ data }) => { if (data != null) setOrderCount(Number(data)); });
+      .then(({ data }) => { if (data != null) setOrderCount(Number(data)); });
     supabase.from('services').select('id', { count: 'exact', head: true }).eq('is_active', true)
       .then(({ count }) => { if (count != null) setServiceCount(count); });
   }, []);
@@ -70,12 +75,19 @@ export default function Home() {
 
       {/* Platforms */}
       <section style={s.section}>
+        <SectionTitle eyebrow="المنصات المدعومة" title="اختر منصتك وابدأ فوراً" />
+        <p style={s.platHint}>اضغط على أي منصة لتصفّح خدماتها مباشرة</p>
         <div style={s.platGrid} className="plat-grid">
           {platforms.map((p) => (
-            <div key={p.name} style={s.platCard}>
+            <Link
+              key={p.name}
+              to={p.key ? `/services?platform=${p.key}` : '/services'}
+              style={s.platCard}
+            >
               <span style={s.platEmoji}>{p.emoji}</span>
               <span style={s.platName}>{p.name}</span>
-            </div>
+              <span style={s.platGo}>تصفّح ←</span>
+            </Link>
           ))}
         </div>
       </section>
@@ -151,10 +163,14 @@ const s = {
   statLbl: { fontSize: 12, color: theme.textDim },
   statDiv: { width: 1, height: 34, background: theme.border },
   section: { ...wrap, padding: '44px 20px' },
+
+  platHint: { textAlign: 'center', fontSize: 14, color: theme.textDim, marginTop: -20, marginBottom: 24 },
   platGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 },
-  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '20px 10px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18 },
+  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '22px 10px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18, color: theme.text },
   platEmoji: { fontSize: 30 },
-  platName: { fontSize: 13, fontWeight: 600, color: theme.textDim, textAlign: 'center' },
+  platName: { fontSize: 14, fontWeight: 700, color: theme.text, textAlign: 'center' },
+  platGo: { fontSize: 11, fontWeight: 700, color: '#9C7A45' },
+
   secTitle: { textAlign: 'center', marginBottom: 36 },
   eyebrow: { color: '#9C7A45', fontSize: 14, fontWeight: 700, letterSpacing: 1 },
   secH2: { fontSize: 30, fontWeight: 800, marginTop: 8, color: theme.text },
