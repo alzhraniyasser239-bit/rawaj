@@ -4,6 +4,7 @@ import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { theme } from '../theme';
 import ReviewsSection from '../components/ReviewsSection';
+import PlatformIcon from '../components/PlatformIcon';
 
 const features = [
   { icon: '⚡', title: 'تنفيذ فوري', desc: 'أغلب الطلبات تبدأ خلال دقائق.' },
@@ -20,14 +21,14 @@ const steps = [
 
 // المفاتيح مطابقة لصفحة الخدمات
 const platforms = [
-  { key: 'instagram', name: 'انستقرام', emoji: '📸' },
-  { key: 'tiktok', name: 'تيك توك', emoji: '🎵' },
-  { key: 'twitter', name: 'تويتر / X', emoji: '✖️' },
-  { key: 'telegram', name: 'تليجرام', emoji: '✈️' },
-  { key: 'youtube', name: 'يوتيوب', emoji: '▶️' },
-  { key: 'facebook', name: 'فيسبوك', emoji: '👥' },
-  { key: 'snapchat', name: 'سناب شات', emoji: '👻' },
-  { key: null, name: 'المزيد', emoji: '✨' },
+  { key: 'instagram', icon: 'instagram', name: 'انستقرام' },
+  { key: 'tiktok', icon: 'tiktok', name: 'تيك توك' },
+  { key: 'twitter', icon: 'twitter', name: 'تويتر / X' },
+  { key: 'telegram', icon: 'telegram', name: 'تليجرام' },
+  { key: 'youtube', icon: 'youtube', name: 'يوتيوب' },
+  { key: 'facebook', icon: 'facebook', name: 'فيسبوك' },
+  { key: 'snapchat', icon: 'snapchat', name: 'سناب شات' },
+  { key: null, icon: 'other', name: 'المزيد' },
 ];
 
 export default function Home() {
@@ -84,7 +85,7 @@ export default function Home() {
               to={p.key ? `/services?platform=${p.key}` : '/services'}
               style={s.platCard}
             >
-              <span style={s.platEmoji}>{p.emoji}</span>
+              <PlatformIcon name={p.icon} size={44} />
               <span style={s.platName}>{p.name}</span>
               <span style={s.platGo}>تصفّح ←</span>
             </Link>
@@ -166,8 +167,7 @@ const s = {
 
   platHint: { textAlign: 'center', fontSize: 14, color: theme.textDim, marginTop: -20, marginBottom: 24 },
   platGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 },
-  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '22px 10px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18, color: theme.text },
-  platEmoji: { fontSize: 30 },
+  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '22px 10px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18, color: theme.text },
   platName: { fontSize: 14, fontWeight: 700, color: theme.text, textAlign: 'center' },
   platGo: { fontSize: 11, fontWeight: 700, color: '#9C7A45' },
 
