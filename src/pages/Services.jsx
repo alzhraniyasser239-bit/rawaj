@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase, SUPABASE_URL } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
@@ -36,6 +36,8 @@ const TYPES = [
 
 const TYPE_ORDER = ['followers', 'likes', 'views', 'comments', 'interactions', 'story', 'other'];
 const OTHER_TYPE = { key: 'other', label: 'خدمات أخرى', icon: '✨' };
+
+const VALID_PLATFORMS = [...PLATFORM_ORDER];
 
 function detectPlatform(category) {
   const c = category || '';
@@ -97,6 +99,7 @@ function dedupe(list) {
 export default function Services() {
   const { user, profile, refreshProfile } = useAuth();
   const nav = useNavigate();
+  const [params, setParams] = useSearchParams();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activePlatform, setActivePlatform] = useState(null);
@@ -104,6 +107,17 @@ export default function Services() {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(null);
+
+  // قراءة المنصة من الرابط (قادمة من الصفحة الرئيسية)
+  useEffect(() => {
+    const p = params.get('platform');
+    if (p && VALID_PLATFORMS.includes(p)) {
+      setActivePlatform(p);
+      setActiveType(null);
+      setQuery('');
+      setPage(1);
+    }
+  }, [params]);
 
   useEffect(() => {
     (async () => {
@@ -217,6 +231,7 @@ export default function Services() {
     setActiveType(null);
     setQuery('');
     setPage(1);
+    if (params.get('platform')) setParams({}, { replace: true });
   }
 
   function onSearch(v) {
@@ -261,12 +276,7 @@ export default function Services() {
             </span>
             <span style={s.sortNote}>مرتّبة من الأرخص للأغلى</span>
           </div>
-          <ServiceGrid
-            list={paged}
-            user={user}
-            onPick={setSelected}
-            nav={nav}
-          />
+          <ServiceGrid list={paged} user={user} onPick={setSelected} nav={nav} />
           {paged.length < filtered.length && (
             <div style={s.center}>
               <button style={s.moreBtn} onClick={() => setPage(page + 1)}>
@@ -331,12 +341,7 @@ export default function Services() {
                 })}
               </div>
 
-              <ServiceGrid
-                list={paged}
-                user={user}
-                onPick={setSelected}
-                nav={nav}
-              />
+              <ServiceGrid list={paged} user={user} onPick={setSelected} nav={nav} />
 
               {paged.length < filtered.length && (
                 <div style={s.center}>
