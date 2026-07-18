@@ -20,8 +20,9 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   const isAdmin = user?.email === ADMIN_EMAIL || profile?.role === 'admin';
-
   const allLinks = isAdmin ? [...navLinks, { to: '/admin', label: '⚙️ الإدارة', admin: true }] : navLinks;
+
+  const initial = (profile?.username || user?.email || '؟').trim().charAt(0).toUpperCase();
 
   return (
     <header style={s.header}>
@@ -43,10 +44,21 @@ export default function Header() {
         <div style={s.actions}>
           {user ? (
             <>
-              <Link to="/dashboard" style={s.balancePill}>
+              <Link to="/wallet" style={s.balancePill} title="اشحن رصيدك">
                 <span style={s.balanceNum}>{Number(profile?.balance_sar || 0).toFixed(2)}</span>
                 <span style={s.balanceCur}>ر.س</span>
+                <span style={s.balancePlus}>+</span>
               </Link>
+
+              <Link
+                to="/dashboard"
+                style={{ ...s.avatar, ...(loc.pathname === '/dashboard' ? s.avatarActive : {}) }}
+                title="حسابي ولوحة التحكم"
+                aria-label="حسابي"
+              >
+                {initial}
+              </Link>
+
               <button style={s.ghostBtn} className="hide-mobile" onClick={() => { signOut(); nav('/'); }}>خروج</button>
             </>
           ) : (
@@ -63,13 +75,25 @@ export default function Header() {
 
       {open && (
         <div style={s.mobileMenu} className="mobile-menu">
+          {user && (
+            <Link to="/dashboard" onClick={() => setOpen(false)} style={s.mobileProfile}>
+              <span style={s.mobileAvatar}>{initial}</span>
+              <span style={s.mobileProfileText}>
+                <b style={s.mobileProfileName}>{profile?.username || 'حسابي'}</b>
+                <span style={s.mobileProfileSub}>لوحة التحكم وطلباتي</span>
+              </span>
+            </Link>
+          )}
+
           {allLinks.map((l) => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)}
               style={{ ...s.mobileLink, ...(l.admin ? s.adminLink : {}), ...(loc.pathname === l.to ? s.mobileLinkActive : {}) }}>
               {l.label}
             </Link>
           ))}
+
           <div style={s.mobileDivider} />
+
           {user ? (
             <button style={s.mobileAuthBtn} onClick={() => { signOut(); nav('/'); setOpen(false); }}>تسجيل الخروج</button>
           ) : (
@@ -102,15 +126,34 @@ const s = {
   linkActive: { color: theme.text, background: 'rgba(156,122,69,0.18)' },
   adminLink: { color: '#92400E', border: '1px solid rgba(146,64,14,0.35)' },
   actions: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 },
+
   balancePill: { display: 'flex', alignItems: 'center', gap: 4, padding: '7px 12px', background: 'rgba(156,122,69,0.16)', border: '1px solid rgba(156,122,69,0.35)', borderRadius: 12 },
   balanceNum: { fontWeight: 800, fontSize: 14, color: '#7A5D33' },
   balanceCur: { fontSize: 11, color: theme.textDim },
-  ghostBtn: { padding: '9px 15px', borderRadius: 12, border: `1px solid ${theme.border}`, background: 'transparent', color: theme.text, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap' },
+  balancePlus: { fontSize: 15, fontWeight: 800, color: '#7A5D33', marginRight: 2, opacity: 0.7 },
+
+  avatar: {
+    width: 38, height: 38, flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    borderRadius: '50%', background: theme.gradient, color: '#fff',
+    fontSize: 15, fontWeight: 800,
+    border: '2px solid transparent',
+    boxShadow: '0 4px 12px rgba(122,93,51,0.25)',
+  },
+  avatarActive: { border: '2px solid #7A5D33' },
+
+  ghostBtn: { padding: '9px 15px', borderRadius: 12, border: `1px solid ${theme.border}`, background: 'transparent', color: theme.text, fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer', fontFamily: 'inherit' },
   primaryBtn: { padding: '9px 16px', borderRadius: 12, border: 'none', background: theme.gradient, color: '#fff', fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap' },
-  burger: { display: 'none', background: 'rgba(58,42,28,0.07)', border: `1px solid ${theme.border}`, color: theme.text, fontSize: 20, width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  burger: { display: 'none', background: 'rgba(58,42,28,0.07)', border: `1px solid ${theme.border}`, color: theme.text, fontSize: 20, width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', cursor: 'pointer' },
+
   mobileMenu: { display: 'flex', flexDirection: 'column', gap: 4, padding: '12px 16px 20px', borderTop: `1px solid ${theme.border}`, background: 'rgba(243,235,221,0.99)' },
+  mobileProfile: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 14, background: 'rgba(156,122,69,0.14)', border: '1px solid rgba(156,122,69,0.3)', marginBottom: 8 },
+  mobileAvatar: { width: 42, height: 42, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: theme.gradient, color: '#fff', fontSize: 17, fontWeight: 800 },
+  mobileProfileText: { display: 'flex', flexDirection: 'column', gap: 2 },
+  mobileProfileName: { fontSize: 15, color: theme.text },
+  mobileProfileSub: { fontSize: 12, color: theme.textDim },
   mobileLink: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 600, color: theme.textDim, background: 'rgba(58,42,28,0.05)' },
   mobileLinkActive: { color: theme.text, background: 'rgba(156,122,69,0.18)' },
   mobileDivider: { height: 1, background: theme.border, margin: '8px 0' },
-  mobileAuthBtn: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 700, color: theme.text, background: 'transparent', border: `1px solid ${theme.border}`, textAlign: 'center', width: '100%' },
+  mobileAuthBtn: { padding: '14px 16px', borderRadius: 12, fontSize: 16, fontWeight: 700, color: theme.text, background: 'transparent', border: `1px solid ${theme.border}`, textAlign: 'center', width: '100%', cursor: 'pointer', fontFamily: 'inherit' },
 };
