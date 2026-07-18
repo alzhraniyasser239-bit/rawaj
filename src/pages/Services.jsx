@@ -4,23 +4,24 @@ import { supabase, SUPABASE_URL } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { theme } from '../theme';
 import { validateLink, platformLabel, targetHint } from '../lib/linkValidation';
+import PlatformIcon from '../components/PlatformIcon';
 
 const PAGE_SIZE = 40;
 
 // ===== تصنيف المنصات =====
 const PLATFORMS = [
-  { key: 'tiktok',    label: 'تيك توك',   icon: '🎵', match: ['تيك توك', 'تيك توك', 'TikTok'] },
-  { key: 'instagram', label: 'انستقرام',  icon: '📸', match: ['انستقرام', 'انستگرام', 'Instagram', 'IG '] },
-  { key: 'snapchat',  label: 'سناب شات',  icon: '👻', match: ['سناب شات', 'سناب'] },
-  { key: 'youtube',   label: 'يوتيوب',    icon: '▶️', match: ['يوتيوب', 'YouTube'] },
-  { key: 'twitter',   label: 'تويتر / X', icon: '✖️', match: ['تويتر', 'Twitter'] },
-  { key: 'facebook',  label: 'فيسبوك',    icon: '👥', match: ['فيسبوك', 'Facebook'] },
-  { key: 'telegram',  label: 'تليجرام',   icon: '✈️', match: ['تليجرام', 'تليگرام', 'Telegram'] },
-  { key: 'whatsapp',  label: 'واتساب',    icon: '💬', match: ['وتساب', 'واتساب', 'WhatsApp'] },
+  { key: 'tiktok',    label: 'تيك توك',   match: ['تيك توك', 'تيك توك', 'TikTok'] },
+  { key: 'instagram', label: 'انستقرام',  match: ['انستقرام', 'انستگرام', 'Instagram', 'IG '] },
+  { key: 'snapchat',  label: 'سناب شات',  match: ['سناب شات', 'سناب'] },
+  { key: 'youtube',   label: 'يوتيوب',    match: ['يوتيوب', 'YouTube'] },
+  { key: 'twitter',   label: 'تويتر / X', match: ['تويتر', 'Twitter'] },
+  { key: 'facebook',  label: 'فيسبوك',    match: ['فيسبوك', 'Facebook'] },
+  { key: 'telegram',  label: 'تليجرام',   match: ['تليجرام', 'تليگرام', 'Telegram'] },
+  { key: 'whatsapp',  label: 'واتساب',    match: ['وتساب', 'واتساب', 'WhatsApp'] },
 ];
 
-const DEALS = { key: 'deals', label: 'الأرخص مبيعاً', icon: '🔥' };
-const OTHER = { key: 'other', label: 'منصات أخرى', icon: '🌐' };
+const DEALS = { key: 'deals', label: 'الأرخص مبيعاً' };
+const OTHER = { key: 'other', label: 'منصات أخرى' };
 
 const PLATFORM_ORDER = ['tiktok', 'instagram', 'snapchat', 'youtube', 'twitter', 'facebook', 'telegram', 'whatsapp', 'other', 'deals'];
 
@@ -301,7 +302,7 @@ export default function Services() {
                   const info = platformInfo(k);
                   return (
                     <button key={k} style={s.platCard} onClick={() => pickPlatform(k)}>
-                      <span style={s.platIcon}>{info.icon}</span>
+                      <PlatformIcon name={k} size={46} />
                       <span style={s.platLabel}>{info.label}</span>
                       <span style={s.platCount}>{platformCounts[k].toLocaleString('ar')} خدمة</span>
                     </button>
@@ -316,7 +317,10 @@ export default function Services() {
             <>
               <div style={s.breadcrumb}>
                 <button style={s.backBtn} onClick={resetAll}>← كل المنصات</button>
-                <span style={s.crumbNow}>{pInfo.icon} {pInfo.label}</span>
+                <span style={s.crumbWrap}>
+                  <PlatformIcon name={activePlatform} size={26} />
+                  <span style={s.crumbNow}>{pInfo.label}</span>
+                </span>
                 <span style={s.sortNote}>مرتّبة من الأرخص للأغلى</span>
               </div>
 
@@ -378,6 +382,9 @@ function ServiceGrid({ list, user, onPick, nav }) {
         return (
           <div key={svc.id} style={s.card}>
             <div style={s.cardTop}>
+              <span style={s.cardIconWrap}>
+                <PlatformIcon name={svc._platform} size={22} />
+              </span>
               <div style={s.cardCat}>{svc.category}</div>
               {svc.refill && <div style={s.refillBadge}>♻️ تعويض</div>}
             </div>
@@ -532,13 +539,13 @@ const s = {
   clearBtn: { border: 'none', background: 'transparent', cursor: 'pointer', color: theme.textDim, fontSize: 16, padding: 6 },
 
   platGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14, marginBottom: 20 },
-  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '26px 14px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, cursor: 'pointer', color: theme.text, fontFamily: 'inherit' },
-  platIcon: { fontSize: 34 },
+  platCard: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, padding: '24px 14px', background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 20, cursor: 'pointer', color: theme.text, fontFamily: 'inherit' },
   platLabel: { fontSize: 16, fontWeight: 800, color: theme.text },
   platCount: { fontSize: 12, color: theme.textFaint },
 
   breadcrumb: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, flexWrap: 'wrap' },
   backBtn: { padding: '9px 16px', borderRadius: 100, border: `1px solid ${theme.border}`, background: theme.bgCard, color: theme.textDim, fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' },
+  crumbWrap: { display: 'flex', alignItems: 'center', gap: 8 },
   crumbNow: { fontSize: 18, fontWeight: 800, color: '#5C4432' },
   sortNote: { fontSize: 12, color: theme.textFaint, padding: '5px 12px', borderRadius: 100, background: 'rgba(156,122,69,0.10)' },
 
@@ -548,9 +555,10 @@ const s = {
 
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 },
   card: { display: 'flex', flexDirection: 'column', padding: 20, background: theme.bgCard, border: `1px solid ${theme.border}`, borderRadius: 18, color: theme.text },
-  cardTop: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 },
-  cardCat: { display: 'inline-block', padding: '4px 10px', borderRadius: 100, background: 'rgba(156,122,69,0.15)', color: '#7A5D33', fontSize: 12, fontWeight: 600 },
-  refillBadge: { padding: '4px 10px', borderRadius: 100, background: 'rgba(21,128,61,0.12)', color: '#15803D', fontSize: 11, fontWeight: 700 },
+  cardTop: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 },
+  cardIconWrap: { display: 'flex', flexShrink: 0 },
+  cardCat: { flex: 1, display: 'inline-block', padding: '4px 10px', borderRadius: 100, background: 'rgba(156,122,69,0.15)', color: '#7A5D33', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  refillBadge: { flexShrink: 0, padding: '4px 10px', borderRadius: 100, background: 'rgba(21,128,61,0.12)', color: '#15803D', fontSize: 11, fontWeight: 700 },
   cardName: { fontSize: 15, fontWeight: 600, lineHeight: 1.7, marginBottom: 12, flex: 1, color: theme.text },
   cardMeta: { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: theme.textFaint, marginBottom: 14 },
   timeChip: { color: '#5C4432' },
