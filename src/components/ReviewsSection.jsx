@@ -12,11 +12,11 @@ export default function ReviewsSection() {
 
     (async () => {
       // كل التقييمات — للمعدّل والعدد
-      const { data: all } = await supabase.from('reviews').select('rating');
+      const { data: all } = await supabase.from('public_reviews').select('rating');
 
       // التقييمات اللي فيها تعليق — للعرض
       const { data: withComments } = await supabase
-        .from('reviews')
+        .from('public_reviews')
         .select('id, rating, comment, created_at')
         .not('comment', 'is', null)
         .order('created_at', { ascending: false })
